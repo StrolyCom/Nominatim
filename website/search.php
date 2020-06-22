@@ -4,7 +4,7 @@ require_once(CONST_BasePath.'/lib/init-website.php');
 require_once(CONST_BasePath.'/lib/log.php');
 require_once(CONST_BasePath.'/lib/Geocode.php');
 require_once(CONST_BasePath.'/lib/output.php');
-ini_set('memory_limit', '200M');
+ini_set('memory_limit', '2000M');
 
 $oDB = new Nominatim\DB();
 $oDB->connect();
@@ -31,8 +31,18 @@ set_exception_handler_by_format($sOutputFormat);
 $sForcedGeometry = ($sOutputFormat == 'html') ? 'geojson' : null;
 $oGeocode->loadParamArray($oParams, $sForcedGeometry);
 
-if (CONST_Search_BatchMode && isset($_GET['batch'])) {
-    $aBatch = json_decode($_GET['batch'], true);
+
+// file_put_contents('php://stderr', print_r("asdgsadgdsahasdhsdahsadhsdahsdahsahasdhsdahashsdahasdhash", TRUE));
+//error_log(print_r("POST".file_get_contents('php://input'), TRUE));
+
+if (isset($_GET['batch'])) {
+    if ($_GET['batch'] == "post"){
+	$batchData = file_get_contents('php://input');
+        $aBatch = json_decode($batchData, true);
+        //error_log(print_r("aBatch".$aBatch, TRUE));
+    } else {
+        $aBatch = json_decode($_GET['batch'], true);
+    }
     $aBatchResults = array();
     foreach ($aBatch as $aBatchParams) {
         $oBatchGeocode = clone $oGeocode;
