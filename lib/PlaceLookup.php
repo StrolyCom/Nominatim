@@ -134,12 +134,13 @@ class PlaceLookup
         if ($this->sAnchorSql) {
             $sSQL = 'ST_Distance('.$this->sAnchorSql.','.$sGeometry.')';
         } else {
-            $sSQL = '(SELECT max(ai_p.importance * (ai_p.rank_address + 2))';
-            $sSQL .= '   FROM place_addressline ai_s, placex ai_p';
-            $sSQL .= '   WHERE ai_s.place_id = '.$sPlaceId;
-            $sSQL .= '     AND ai_p.place_id = ai_s.address_place_id ';
-            $sSQL .= '     AND ai_s.isaddress ';
-            $sSQL .= '     AND ai_p.importance is not null)';
+            // $sSQL = '(SELECT max(ai_p.importance * (ai_p.rank_address + 2))';
+            // $sSQL .= '   FROM place_addressline ai_s, placex ai_p';
+            // $sSQL .= '   WHERE ai_s.place_id = '.$sPlaceId;
+            // $sSQL .= '     AND ai_p.place_id = ai_s.address_place_id ';
+            // $sSQL .= '     AND ai_s.isaddress ';
+	    // $sSQL .= '     AND ai_p.importance is not null)';
+	    $sSQL = '0';
         }
 
         return $sSQL.' AS addressimportance,';
@@ -169,7 +170,6 @@ class PlaceLookup
 
     public function lookup($aResults, $iMinRank = 0, $iMaxRank = 30)
     {
-        Debug::newFunction('Place lookup');
 
         if (empty($aResults)) {
             return array();
@@ -178,7 +178,6 @@ class PlaceLookup
 
         $sPlaceIDs = Result::joinIdsByTable($aResults, Result::TABLE_PLACEX);
         if ($sPlaceIDs) {
-            Debug::printVar('Ids from placex', $sPlaceIDs);
             $sSQL  = 'SELECT ';
             $sSQL .= '    osm_type,';
             $sSQL .= '    osm_id,';
@@ -248,7 +247,6 @@ class PlaceLookup
         // postcode table
         $sPlaceIDs = Result::joinIdsByTable($aResults, Result::TABLE_POSTCODE);
         if ($sPlaceIDs) {
-            Debug::printVar('Ids from location_postcode', $sPlaceIDs);
             $sSQL = 'SELECT';
             $sSQL .= "  'P' as osm_type,";
             $sSQL .= '  (SELECT osm_id from placex p WHERE p.place_id = lp.parent_place_id) as osm_id,';
@@ -279,7 +277,6 @@ class PlaceLookup
             if (CONST_Use_US_Tiger_Data) {
                 $sPlaceIDs = Result::joinIdsByTable($aResults, Result::TABLE_TIGER);
                 if ($sPlaceIDs) {
-                    Debug::printVar('Ids from Tiger table', $sPlaceIDs);
                     $sHousenumbers = Result::sqlHouseNumberTable($aResults, Result::TABLE_TIGER);
                     // Tiger search only if a housenumber was searched and if it was found
                     // (realized through a join)
@@ -325,7 +322,6 @@ class PlaceLookup
             // osmline - interpolated housenumbers
             $sPlaceIDs = Result::joinIdsByTable($aResults, Result::TABLE_OSMLINE);
             if ($sPlaceIDs) {
-                Debug::printVar('Ids from interpolation', $sPlaceIDs);
                 $sHousenumbers = Result::sqlHouseNumberTable($aResults, Result::TABLE_OSMLINE);
                 // interpolation line search only if a housenumber was searched
                 // (realized through a join)
@@ -416,7 +412,6 @@ class PlaceLookup
         }
 
         $sSQL = join(' UNION ', $aSubSelects);
-        Debug::printSQL($sSQL);
         $aPlaces = $this->oDB->getAll($sSQL, null, 'Could not lookup place');
 
         foreach ($aPlaces as &$aPlace) {
@@ -454,7 +449,6 @@ class PlaceLookup
             );
         }
 
-        Debug::printVar('Places', $aPlaces);
 
         return $aPlaces;
     }

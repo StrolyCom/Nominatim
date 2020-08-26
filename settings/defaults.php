@@ -101,7 +101,7 @@ if (isset($_GET['debug']) && $_GET['debug']) @define('CONST_Debug', true);
 
 @define('CONST_Search_AreaPolygons', true);
 
-@define('CONST_Search_BatchMode', false);
+@define('CONST_Search_BatchMode', true);
 
 @define('CONST_Search_NameOnlySearchFrequencyThreshold', 500);
 // If set to true, then reverse order of queries will be tried by default.
@@ -122,3 +122,5 @@ if (isset($_GET['debug']) && $_GET['debug']) @define('CONST_Debug', true);
 @define('CONST_Log_DB', false);
 // Set to a file name to enable logging to a file.
 @define('CONST_Log_File', false);
+
+@define('CONST_Secret_Key', 'test_key');

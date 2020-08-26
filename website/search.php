@@ -4,7 +4,13 @@ require_once(CONST_BasePath.'/lib/init-website.php');
 require_once(CONST_BasePath.'/lib/log.php');
 require_once(CONST_BasePath.'/lib/Geocode.php');
 require_once(CONST_BasePath.'/lib/output.php');
-ini_set('memory_limit', '200M');
+ini_set('memory_limit', '2000M');
+
+if(!isset($_GET['key']) or $_GET['key'] != "test_key"){
+    error_log(print_r("Unauthorized access, incorrect key", TRUE));
+    http_response_code(401);
+    exit(1);
+}
 
 $oDB = new Nominatim\DB();
 $oDB->connect();
@@ -31,13 +37,17 @@ set_exception_handler_by_format($sOutputFormat);
 $sForcedGeometry = ($sOutputFormat == 'html') ? 'geojson' : null;
 $oGeocode->loadParamArray($oParams, $sForcedGeometry);
 
-if (CONST_Search_BatchMode && isset($_GET['batch'])) {
-    $aBatch = json_decode($_GET['batch'], true);
+if (isset($_GET['batch'])) {
+    if ($_GET['batch'] == "post"){
+	$batchData = file_get_contents('php://input');
+        $aBatch = json_decode($batchData, true);
+    } else {
+        $aBatch = json_decode($_GET['batch'], true);
+    }
     $aBatchResults = array();
     foreach ($aBatch as $aBatchParams) {
         $oBatchGeocode = clone $oGeocode;
         $oBatchParams = new Nominatim\ParameterParser($aBatchParams);
-        $oBatchGeocode->loadParamArray($oBatchParams);
         $oBatchGeocode->setQueryFromParams($oBatchParams);
         $aSearchResults = $oBatchGeocode->lookup();
         $aBatchResults[] = $aSearchResults;

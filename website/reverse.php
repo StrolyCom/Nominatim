@@ -7,6 +7,12 @@ require_once(CONST_BasePath.'/lib/ReverseGeocode.php');
 require_once(CONST_BasePath.'/lib/output.php');
 ini_set('memory_limit', '200M');
 
+if(!isset($_GET['key']) or $_GET['key'] != "test_key"){
+    error_log(print_r("Unauthorized access, incorrect key", TRUE));
+    http_response_code(401);
+    exit(1);
+}
+
 $oParams = new Nominatim\ParameterParser();
 
 // Format for output
