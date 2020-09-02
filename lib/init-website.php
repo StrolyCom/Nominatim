@@ -3,6 +3,14 @@
 require_once('init.php');
 require_once('ParameterParser.php');
 require_once(CONST_Debug ? 'DebugHtml.php' : 'DebugNone.php');
+require_once(CONST_BasePath.'/settings/api_keys.php');
+
+if(!isset($_GET['key']) or !in_array($_GET['key'], $api_keys)){
+    error_log(print_r("Unauthorized access, incorrect key", TRUE));
+    http_response_code(401);
+    exit(1);
+}
+
 
 /***************************************************************************
  *

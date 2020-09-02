@@ -6,12 +6,6 @@ require_once(CONST_BasePath.'/lib/Geocode.php');
 require_once(CONST_BasePath.'/lib/output.php');
 ini_set('memory_limit', '2000M');
 
-if(!isset($_GET['key']) or $_GET['key'] != "test_key"){
-    error_log(print_r("Unauthorized access, incorrect key", TRUE));
-    http_response_code(401);
-    exit(1);
-}
-
 $oDB = new Nominatim\DB();
 $oDB->connect();
 $oParams = new Nominatim\ParameterParser();
